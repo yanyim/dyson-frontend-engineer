@@ -60,3 +60,27 @@
   name: '@deepseek-ai/dsh-tool-todo'
   config:
     allowParallelInProgress: true
+
+# ── 压缩(#148:逐字照抄 vendored standard preset 的 compaction 组,勿自创写法)──
+# 隐性契约:compaction-basic 经 ctx.get 读 toolResultPrune,pruner 必须同 isolate realm;
+# tokenMeter 刻意留在 host plane(进程单例、按会话记 fold、持有 context-meter 投影——进 realm
+# 会随 preset 挂卸漂移),故此处不挂。
+- id: compaction
+  name: cordis:group
+  group: true
+  isolate:
+    compaction: true
+    toolResultPruner: true
+  config:
+    - id: compaction-basic
+      name: '@deepseek-ai/dsh-compaction-basic'
+
+    - id: command-compact
+      name: '@deepseek-ai/dsh-command-compact'
+
+    - id: tool-result-pruner
+      name: '@deepseek-ai/dsh-compaction-tool-result-pruner'
+      config:
+        thresholdChars: 8192
+        headChars: 4096
+        tailChars: 1024
